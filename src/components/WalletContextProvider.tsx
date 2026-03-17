@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, ReactNode } from "react";
+import { useMemo, useState, useEffect, ReactNode } from "react";
 import {
   ConnectionProvider,
   WalletProvider,
@@ -20,18 +20,34 @@ export function WalletContextProvider({ children }: { children: ReactNode }) {
     return WalletAdapterNetwork.Devnet;
   }, [networkType]);
 
+  const [isTelegram, setIsTelegram] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (window as any).Telegram?.WebApp) {
+      setIsTelegram(true);
+    }
+  }, []);
+
   const wallets = useMemo(
-    () => [
-      new PhantomWalletAdapter(),
-      new SolflareWalletAdapter(),
-      new WalletConnectWalletAdapter({
+    () => {
+      const connectAdapter = new WalletConnectWalletAdapter({
         network: network,
         options: {
           projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "",
         },
-      }),
-    ],
-    [network]
+      });
+
+      if (isTelegram) {
+        return [connectAdapter];
+      }
+
+      return [
+        new PhantomWalletAdapter(),
+        new SolflareWalletAdapter(),
+        connectAdapter,
+      ];
+    },
+    [network, isTelegram]
   );
 
   return (
