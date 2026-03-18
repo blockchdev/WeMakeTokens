@@ -7,6 +7,9 @@ export async function POST(req: NextRequest) {
     const name = formData.get("name") as string;
     const symbol = formData.get("symbol") as string;
     const description = formData.get("description") as string;
+    const website = (formData.get("website") as string) || "";
+    const twitter = (formData.get("twitter") as string) || "";
+    const telegram = (formData.get("telegram") as string) || "";
 
     if (!file || !name || !symbol || !description) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -48,7 +51,7 @@ export async function POST(req: NextRequest) {
     const imageUri = `https://gateway.pinata.cloud/ipfs/${imageData.IpfsHash}`;
 
     // 2. Upload JSON Metadata
-    const jsonMetadata = {
+    const jsonMetadata: any = {
       name,
       symbol,
       description,
@@ -65,6 +68,13 @@ export async function POST(req: NextRequest) {
         category: "image",
       },
     };
+
+    if (website || twitter || telegram) {
+      jsonMetadata.extensions = {};
+      if (website) jsonMetadata.extensions.website = website;
+      if (twitter) jsonMetadata.extensions.twitter = twitter;
+      if (telegram) jsonMetadata.extensions.telegram = telegram;
+    }
 
     const jsonRes = await fetch("https://api.pinata.cloud/pinning/pinJSONToIPFS", {
       method: "POST",

@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useNetwork } from "./NetworkProvider";
-import { Upload, Coins, ShieldCheck, Zap, Info, ArrowRight, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { Upload, Coins, ShieldCheck, Zap, Info, ArrowRight, CheckCircle2, AlertCircle, Loader2, Globe, Twitter, MessageCircle } from "lucide-react";
 import { createToken } from "@/utils/token";
 
 export function TokenForm() {
@@ -19,6 +19,9 @@ export function TokenForm() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [revokeMint, setRevokeMint] = useState(false);
   const [revokeFreeze, setRevokeFreeze] = useState(false);
+  const [website, setWebsite] = useState("");
+  const [twitter, setTwitter] = useState("");
+  const [telegram, setTelegram] = useState("");
   
   const [status, setStatus] = useState<"idle" | "uploading" | "creating" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -62,6 +65,9 @@ export function TokenForm() {
       formData.append("name", name);
       formData.append("symbol", symbol);
       formData.append("description", description);
+      formData.append("website", website.trim());
+      formData.append("twitter", twitter.trim());
+      formData.append("telegram", telegram.trim());
 
       const uploadRes = await fetch("/api/upload", {
         method: "POST",
@@ -200,6 +206,50 @@ export function TokenForm() {
                   rows={3}
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 outline-none focus:border-purple-500 transition-colors resize-none"
                 />
+              </div>
+
+              <div className="space-y-4 pt-4 border-t border-slate-800">
+                <h3 className="text-lg font-medium flex items-center gap-2">
+                   Social Links <span className="text-xs text-slate-500 font-normal">(Optional)</span>
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-slate-400 flex items-center gap-1">
+                      <Globe size={12} className="text-blue-400" /> Website
+                    </label>
+                    <input 
+                      type="url" 
+                      value={website} 
+                      onChange={(e) => setWebsite(e.target.value)}
+                      placeholder="https://..." 
+                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm outline-none focus:border-purple-500 transition-colors"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-slate-400 flex items-center gap-1">
+                      <Twitter size={12} className="text-sky-400" /> X (Twitter)
+                    </label>
+                    <input 
+                      type="url" 
+                      value={twitter} 
+                      onChange={(e) => setTwitter(e.target.value)}
+                      placeholder="https://x.com/..." 
+                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm outline-none focus:border-purple-500 transition-colors"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-slate-400 flex items-center gap-1">
+                      <MessageCircle size={12} className="text-blue-500" /> Telegram
+                    </label>
+                    <input 
+                      type="url" 
+                      value={telegram} 
+                      onChange={(e) => setTelegram(e.target.value)}
+                      placeholder="https://t.me/..." 
+                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm outline-none focus:border-purple-500 transition-colors"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-2">
